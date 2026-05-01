@@ -21,7 +21,7 @@ func LoggerMiddleware(appLog bootstrap.Logger) gin.HandlerFunc {
 		status := c.Writer.Status()
 
 		if err := c.Errors.Last(); err != nil {
-			appLog.Infow(err.Error(),
+			appLog.Errorw(err.Error(),
 				zap.Time("timestamp", start),
 				zap.String("method", method),
 				zap.String("host", host),
@@ -32,7 +32,7 @@ func LoggerMiddleware(appLog bootstrap.Logger) gin.HandlerFunc {
 			return
 		}
 
-		appLog.Infow("success log",
+		appLog.Infow("request log",
 			zap.Time("timestamp", start),
 			zap.String("method", method),
 			zap.String("host", host),

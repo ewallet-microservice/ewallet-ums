@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/mhasnanr/ewallet-ums/cmd/wallet"
 	"github.com/mhasnanr/ewallet-ums/constants"
 	"github.com/mhasnanr/ewallet-ums/helpers"
 	"github.com/mhasnanr/ewallet-ums/internal/models"
@@ -27,7 +28,7 @@ type UserRepository interface {
 }
 
 type WalletAPI interface {
-	CreateWallet(userID int) error
+	CreateWallet(ctx context.Context, userID int) (*wallet.CreateWalletResponse, error)
 }
 
 type SessionRepository interface {
@@ -69,7 +70,7 @@ func (s *UserService) Register(ctx context.Context, user *models.User) (*models.
 
 	user.Password = ""
 
-	if err := s.walletAPI.CreateWallet(user.ID); err != nil {
+	if _, err := s.walletAPI.CreateWallet(ctx, user.ID); err != nil {
 		if err := s.userRepo.DeleteUser(ctx, user.ID); err != nil {
 			return nil, err
 		}
