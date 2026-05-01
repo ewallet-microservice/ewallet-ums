@@ -1,0 +1,25 @@
+// protoc --go_out=. --go-grpc_out=. cmd/proto/wallet.proto
+
+syntax = "proto3";
+
+package wallet;
+
+option go_package = "cmd/wallet";
+
+service Wallet {
+    rpc CreateWallet(CreateWalletRequest) returns (CreateWalletResponse);
+}
+
+message CreateWalletRequest {
+    int64 user_id = 1;
+}
+
+message CreateWalletResponse {
+    string message = 1;
+    WalletData data = 2;
+}
+
+message WalletData {
+    int64 user_id = 1;
+    double balance = 2;
+}
