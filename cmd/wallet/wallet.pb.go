@@ -122,7 +122,7 @@ func (x *CreateWalletResponse) GetData() *WalletData {
 type WalletData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Balance       float64                `protobuf:"fixed64,2,opt,name=balance,proto3" json:"balance,omitempty"`
+	Balance       int64                  `protobuf:"varint,2,opt,name=balance,proto3" json:"balance,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -164,7 +164,7 @@ func (x *WalletData) GetUserId() int64 {
 	return 0
 }
 
-func (x *WalletData) GetBalance() float64 {
+func (x *WalletData) GetBalance() int64 {
 	if x != nil {
 		return x.Balance
 	}
@@ -184,7 +184,7 @@ const file_cmd_proto_wallet_proto_rawDesc = "" +
 	"\n" +
 	"WalletData\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x18\n" +
-	"\abalance\x18\x02 \x01(\x01R\abalance2S\n" +
+	"\abalance\x18\x02 \x01(\x03R\abalance2S\n" +
 	"\x06Wallet\x12I\n" +
 	"\fCreateWallet\x12\x1b.wallet.CreateWalletRequest\x1a\x1c.wallet.CreateWalletResponseB\fZ\n" +
 	"cmd/walletb\x06proto3"
