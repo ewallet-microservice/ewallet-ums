@@ -19,25 +19,21 @@ func ErrorMiddleware() gin.HandlerFunc {
 		}
 
 		err := c.Errors.Last()
-		if err != nil {
-			var appErr *constants.AppError
-			var valErrs validator.ValidationErrors
 
-			if errors.As(err, &appErr) {
-				helpers.SendResponseHTTP(c, appErr.StatusCode, appErr.Message, nil)
-				c.Abort()
-				return
-			}
+		var appErr *constants.AppError
+		var valErrs validator.ValidationErrors
 
-			if errors.As(err, &valErrs) {
-				errStr := helpers.ConstructErrString(valErrs)
-				helpers.SendResponseHTTP(c, http.StatusBadRequest, errStr, nil)
-				c.Abort()
-				return
-			}
-
-			helpers.SendResponseHTTP(c, http.StatusInternalServerError, err.Error(), nil)
+		if errors.As(err, &appErr) {
+			helpers.SendResponseHTTP(c, appErr.StatusCode, appErr.Message, nil)
+			return
 		}
 
+		if errors.As(err, &valErrs) {
+			errStr := helpers.ConstructErrString(valErrs)
+			helpers.SendResponseHTTP(c, http.StatusBadRequest, errStr, nil)
+			return
+		}
+
+		helpers.SendResponseHTTP(c, http.StatusInternalServerError, err.Error(), nil)
 	}
 }
