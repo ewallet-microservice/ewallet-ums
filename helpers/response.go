@@ -25,14 +25,14 @@ func ConstructErrString(errors validator.ValidationErrors) string {
 	errStrings := make([]string, len(errors))
 
 	for i := range errors {
-		var error = errors[i]
-		if tagMap, ok := constants.ValidationErrorMap[error.Tag()]; ok {
-			if msg, ok := tagMap[error.Namespace()]; ok && msg != "" {
+		var err = errors[i]
+		if tagMap, ok := constants.ValidationErrorMap[err.Tag()]; ok {
+			if msg, ok := tagMap[err.Namespace()]; ok && msg != "" {
 				errStrings[i] = msg
 				continue
 			}
 		}
-		errStrings[i] = fmt.Sprintf("Field %s failed on %s validation", error.Field(), error.Tag())
+		errStrings[i] = fmt.Sprintf("Field %s failed on %s validation", err.Field(), err.Tag())
 	}
 
 	return strings.Join(errStrings, ", ")
