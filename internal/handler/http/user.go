@@ -2,11 +2,9 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/mhasnanr/ewallet-ums/constants"
 	"github.com/mhasnanr/ewallet-ums/helpers"
 	"github.com/mhasnanr/ewallet-ums/internal/models"
@@ -48,18 +46,18 @@ func (h *UserHandler) registerUser(c *gin.Context) {
 	var req models.User
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.writeErrorResponse(c, constants.ErrorBadRequest, nil)
+		c.Error(constants.ErrorBadRequest)
 		return
 	}
 
 	if err := req.Validate(); err != nil {
-		h.writeErrorResponse(c, err, nil)
+		c.Error(err)
 		return
 	}
 
 	user, err := h.service.Register(c.Request.Context(), &req)
 	if err != nil {
-		h.writeErrorResponse(c, err, nil)
+		c.Error(err)
 		return
 	}
 
@@ -70,18 +68,18 @@ func (h *UserHandler) login(c *gin.Context) {
 	var req models.LoginRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.writeErrorResponse(c, constants.ErrorBadRequest, nil)
+		c.Error(err)
 		return
 	}
 
 	if err := req.Validate(); err != nil {
-		h.writeErrorResponse(c, err, nil)
+		c.Error(err)
 		return
 	}
 
 	res, err := h.service.Login(c.Request.Context(), req)
 	if err != nil {
-		h.writeErrorResponse(c, err, nil)
+		c.Error(err)
 		return
 	}
 
@@ -91,19 +89,19 @@ func (h *UserHandler) login(c *gin.Context) {
 func (h *UserHandler) logout(c *gin.Context) {
 	token, ok := c.Get("accessToken")
 	if !ok {
-		h.writeErrorResponse(c, constants.ErrorFailedToGetToken, nil)
+		c.Error(constants.ErrorFailedToGetToken)
 		return
 	}
 
 	accessToken, ok := token.(string)
 	if !ok {
-		h.writeErrorResponse(c, constants.ErrorFailedToParseToken, nil)
+		c.Error(constants.ErrorFailedToParseToken)
 		return
 	}
 
 	err := h.service.Logout(c.Request.Context(), accessToken)
 	if err != nil {
-		h.writeErrorResponse(c, err, nil)
+		c.Error(err)
 		return
 	}
 
@@ -115,31 +113,31 @@ func (h *UserHandler) refreshToken(c *gin.Context) {
 
 	token, ok := c.Get("refreshToken")
 	if !ok {
-		h.writeErrorResponse(c, constants.ErrorFailedToGetToken, nil)
+		c.Error(constants.ErrorFailedToGetToken)
 		return
 	}
 
 	refreshToken, ok := token.(string)
 	if !ok {
-		h.writeErrorResponse(c, constants.ErrorFailedToParseToken, nil)
+		c.Error(constants.ErrorFailedToParseToken)
 		return
 	}
 
 	val, ok := c.Get("claim")
 	if !ok {
-		h.writeErrorResponse(c, constants.ErrorFailedToExtractClaims, nil)
+		c.Error(constants.ErrorFailedToExtractClaims)
 		return
 	}
 
 	claim, ok := val.(*helpers.ClaimToken)
 	if !ok {
-		h.writeErrorResponse(c, constants.ErrorFailedToParseClaims, nil)
+		c.Error(constants.ErrorFailedToParseClaims)
 		return
 	}
 
 	newToken, err := h.service.UpdateTokenByRefreshToken(c.Request.Context(), refreshToken, claim)
 	if err != nil {
-		h.writeErrorResponse(c, constants.ErrorFailedToUpdateToken, nil)
+		c.Error(constants.ErrorFailedToUpdateToken)
 		return
 	}
 
@@ -153,25 +151,25 @@ func (h *UserHandler) validateToken(c *gin.Context) {
 
 	token, ok := c.Get("accessToken")
 	if !ok {
-		h.writeErrorResponse(c, constants.ErrorFailedToGetToken, nil)
+		c.Error(constants.ErrorFailedToGetToken)
 		return
 	}
 
 	_, ok = token.(string)
 	if !ok {
-		h.writeErrorResponse(c, constants.ErrorFailedToParseToken, nil)
+		c.Error(constants.ErrorFailedToParseToken)
 		return
 	}
 
 	val, ok := c.Get("claim")
 	if !ok {
-		h.writeErrorResponse(c, constants.ErrorFailedToExtractClaims, nil)
+		c.Error(constants.ErrorFailedToExtractClaims)
 		return
 	}
 
 	claim, ok := val.(*helpers.ClaimToken)
 	if !ok {
-		h.writeErrorResponse(c, constants.ErrorFailedToParseClaims, nil)
+		c.Error(constants.ErrorFailedToParseClaims)
 		return
 	}
 
@@ -181,22 +179,4 @@ func (h *UserHandler) validateToken(c *gin.Context) {
 	response.Fullname = claim.Username
 
 	helpers.SendResponseHTTP(c, http.StatusOK, constants.ValidToken, response)
-}
-
-func (h *UserHandler) writeErrorResponse(c *gin.Context, err error, data any) {
-	var appErr *constants.AppError
-	var valErrs validator.ValidationErrors
-
-	if errors.As(err, &appErr) {
-		helpers.SendResponseHTTP(c, appErr.StatusCode, appErr.Message, data)
-		return
-	}
-
-	if errors.As(err, &valErrs) {
-		errStr := helpers.ConstructErrString(valErrs)
-		helpers.SendResponseHTTP(c, http.StatusBadRequest, errStr, data)
-		return
-	}
-
-	helpers.SendResponseHTTP(c, http.StatusInternalServerError, err.Error(), nil)
 }

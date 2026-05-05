@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -25,8 +26,13 @@ func ConstructErrString(errors validator.ValidationErrors) string {
 
 	for i := range errors {
 		var error = errors[i]
-		var errMsg = constants.ValidationErrorMap[error.Tag()][error.Namespace()]
-		errStrings[i] = errMsg
+		if tagMap, ok := constants.ValidationErrorMap[error.Tag()]; ok {
+			if msg, ok := tagMap[error.Namespace()]; ok && msg != "" {
+				errStrings[i] = msg
+				continue
+			}
+		}
+		errStrings[i] = fmt.Sprintf("Field %s failed on %s validation", error.Field(), error.Tag())
 	}
 
 	return strings.Join(errStrings, ", ")

@@ -2,7 +2,10 @@ package constants
 
 import "net/http"
 
-var ErrBadRequest = "bad request"
+var (
+	ErrBadRequest   = "bad request"
+	ErrUnauthorized = "unauthorized"
+)
 
 var (
 	ErrRequiredEmail         = "email is required"
@@ -24,9 +27,12 @@ var (
 
 var ValidationErrorMap = map[string]map[string]string{
 	"required": {
-		"User.Email":    ErrRequiredEmail,
-		"User.FullName": ErrRequiredFullName,
-		"User.Password": ErrRequiredPassword,
+		"User.Username":         ErrRequiredUsername,
+		"User.Email":            ErrRequiredEmail,
+		"User.FullName":         ErrRequiredFullName,
+		"User.Password":         ErrRequiredPassword,
+		"LoginRequest.Email":    ErrRequiredEmail,
+		"LoginRequest.Password": ErrRequiredPassword,
 	},
 }
 
@@ -44,8 +50,8 @@ func NewAppError(statusCode int, message string) *AppError {
 }
 
 var (
-	ErrorBadRequest = NewAppError(http.StatusBadRequest, ErrBadRequest)
-
+	ErrorBadRequest            = NewAppError(http.StatusBadRequest, ErrBadRequest)
+	ErrorUnauthorized          = NewAppError(http.StatusUnauthorized, ErrUnauthorized)
 	ErrorDuplicateEmail        = NewAppError(http.StatusConflict, ErrDuplicateEmail)
 	ErrorRequiredEmail         = NewAppError(http.StatusBadRequest, ErrRequiredEmail)
 	ErrorUserNotFound          = NewAppError(http.StatusNotFound, ErrUserNotFound)
