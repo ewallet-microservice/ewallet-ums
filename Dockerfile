@@ -5,11 +5,7 @@ WORKDIR  /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-RUN pwd && ls -la
-
 COPY . .
-
-RUN pwd && ls -la
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o ewallet-ums main.go
 
@@ -20,4 +16,4 @@ WORKDIR /root
 COPY --from=builder /app/ewallet-ums  .
 COPY --from=builder /app/.env ./.env
 
-CMD ["./ewallet-ums"]`
+CMD ["./ewallet-ums"]
