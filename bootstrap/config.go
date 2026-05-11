@@ -1,19 +1,26 @@
 package bootstrap
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/joho/godotenv"
 )
 
-var Env map[string]string
-
 func SetupConfig(path string) error {
-	var err error
-	Env, err = godotenv.Read(path)
-	return err
+	workDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	err = godotenv.Load(filepath.Join(workDir, path))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetEnv(key string, defaultValue string) string {
-	result := Env[key]
+	result := os.Getenv(key)
 	if result == "" {
 		return defaultValue
 	}
