@@ -13,7 +13,7 @@ RUN pwd && ls -la
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o ewallet-ums main.go
 
-FROM alpine:latest
+FROM alpine:3.22.2
 
 WORKDIR /root
 
