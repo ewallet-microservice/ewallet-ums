@@ -18,5 +18,6 @@ FROM alpine:3.22.2
 WORKDIR /root
 
 COPY --from=builder /app/ewallet-ums  .
+COPY --from=builder /app/.env ./.env
 
-CMD ["./ewallet-ums"]
+CMD ["./ewallet-ums"]`
